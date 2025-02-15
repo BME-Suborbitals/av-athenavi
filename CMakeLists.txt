@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.28.1)
 
 
 # project settings
-project(stm32f446retx_template C CXX ASM)
+project(athenavi C CXX ASM)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
@@ -40,6 +40,9 @@ add_link_options(-T ${LINKER_SCRIPT})
 
 include(cmake/sources.cmake)
 add_executable(${PROJECT_NAME}.elf ${GENERATED_SOURCES} ${SOURCES} ${LINKER_SCRIPT})
+
+add_subdirectory(app/lib/drivers)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE drivers)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
