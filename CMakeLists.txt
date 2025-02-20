@@ -41,8 +41,15 @@ add_link_options(-T ${LINKER_SCRIPT})
 include(cmake/sources.cmake)
 add_executable(${PROJECT_NAME}.elf ${GENERATED_SOURCES} ${SOURCES} ${LINKER_SCRIPT})
 
+include(cmake/freertos.cmake)
+
 add_subdirectory(app/lib/drivers)
-target_link_libraries(${PROJECT_NAME}.elf PRIVATE drivers)
+add_subdirectory(app/lib/utils)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE 
+    drivers
+    utils
+)
+
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
