@@ -57,10 +57,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TIMEPULSE_Pin GPIO_PIN_0
+#define TIMEPULSE_GPIO_Port GPIOA
+#define GNSS_RST_Pin GPIO_PIN_1
+#define GNSS_RST_GPIO_Port GPIOA
+#define FLASH_HOLD_Pin GPIO_PIN_2
+#define FLASH_HOLD_GPIO_Port GPIOA
+#define FLASH_WP_Pin GPIO_PIN_3
+#define FLASH_WP_GPIO_Port GPIOA
 #define FLASH_CS_Pin GPIO_PIN_4
 #define FLASH_CS_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_6
 #define LED_GPIO_Port GPIOC
+#define INT_MMC_Pin GPIO_PIN_10
+#define INT_MMC_GPIO_Port GPIOC
+#define INT_GYRO_Pin GPIO_PIN_11
+#define INT_GYRO_GPIO_Port GPIOC
+#define INT_ACC_Pin GPIO_PIN_12
+#define INT_ACC_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
