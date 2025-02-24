@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 /*
  * FreeRTOS Kernel V10.3.1
  * Portion Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
@@ -161,3 +162,5 @@ standard names. */
 #define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
 
 #endif /* FREERTOS_CONFIG_H */
+
+// NOLINTEND

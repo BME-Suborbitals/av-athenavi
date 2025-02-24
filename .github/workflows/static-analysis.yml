@@ -1,0 +1,41 @@
+name: Static Analysis
+
+on: [push, pull_request]
+
+jobs:
+  static-analysis:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: Configure project with CMake
+        run: |
+          cmake --preset Debug -DCMAKE_C_FLAGS="-Wall -Wpedantic" -DCMAKE_CXX_FLAGS="-Wall -Wpedantic"
+
+      - name: Compile user files
+        run: |
+          cd build/Debug
+          
+          jq -r '.[] | select(.file | contains("app/src")) | "echo Building \(.file)\n\(.command) -Werror || echo FAILED: \(.file) >> compile_errors.log"' compile_commands.json > compile-user.sh
+          rm -f compile_errors.log
+          sh compile-user.sh
+          
+          if [[ -s compile_errors.log ]]; then
+              cat compile_errors.log
+              exit 1
+          fi
+      
+      - name: Build project
+        run: |
+          cmake --build --preset Debug --parallel
+
+      - name: Run clang-tidy
+        run: |
+          TIDY_DIR="app/src/"
+
+          # Run clang-tidy on all files in the specified directory
+          find ${TIDY_DIR} \( -name '*.cpp' -o -name '*.h' \) -not -path '*/FreeRTOSConfig.h' | xargs clang-tidy -p build/Debug --warnings-as-errors=* -format-style=file --header-filter=".*app\/src\/.*" --extra-arg=--target=arm-none-eabi
