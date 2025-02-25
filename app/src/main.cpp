@@ -2,6 +2,7 @@
 #include "bme280.h"
 #include "i2c.h"
 #include "i2c_device.h"
+#include "serial.h"
 
 extern "C" void SystemClock_Config(void);
 
@@ -10,6 +11,7 @@ int main() {
     SystemClock_Config();
     MX_GPIO_Init();
     MX_I2C1_Init();
+    MX_USART2_UART_Init();
 
     /*communication::I2CDevice i2c_mmc(hi2c1, 0x30);
     sensor::MMC5983MA mmc(&i2c_mmc);
@@ -33,8 +35,12 @@ int main() {
 
         sensor::BME280::Data bmp_data;
         bme.Read(bmp_data);
+        uart_debug::print("Pres = ");
+        uart_debug::print(bmp_data.pressure);
+        uart_debug::print("\tTemp = ");
+        uart_debug::println(bmp_data.temperature);
 
         //HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        HAL_Delay(1000);
+        HAL_Delay(125);
     }
 }
