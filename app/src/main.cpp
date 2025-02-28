@@ -1,6 +1,7 @@
 #include "FreeRTOS.h"
 #include "gpio.h"
 #include "i2c.h"
+#include "iwdg.h"
 #include "spi.h"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
@@ -11,6 +12,7 @@ int main() {
     HAL_Init();
     SystemClock_Config();
 
+    MX_IWDG_Init();
     MX_GPIO_Init();
     MX_I2C1_Init();
     MX_SPI1_Init();
