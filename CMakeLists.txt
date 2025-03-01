@@ -12,6 +12,8 @@ set(CMAKE_C_STANDARD 11)
 # hardware specific options
 include(cmake/stm32f446xx.cmake)
 
+file(GLOB_RECURSE GENERATED_SOURCES "Core/*.*" "Drivers/*.*" "Middlewares/*.*" "USB_DEVICE/*.*")
+
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     message(STATUS "Maximum optimization for speed")
     add_compile_options(-Ofast)
@@ -24,13 +26,16 @@ elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
 else ()
     message(STATUS "Minimal optimization, debug info included")
     add_compile_options(-Og -g)
+    add_definitions(-DDEBUG)
+
+    # Replace default syscalls.c with semihosting to allow debug prints
+    list(FILTER GENERATED_SOURCES EXCLUDE REGEX ".*/Core/Src/syscalls.c")
+    add_link_options(-lc -lrdimon -specs=rdimon.specs)
 endif ()
 
 include_directories(Core/Inc Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Middlewares/ST/STM32_USB_Device_Library/Core/Inc Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc USB_DEVICE/App USB_DEVICE/Target)
 
-add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F446xx)
-
-file(GLOB_RECURSE GENERATED_SOURCES "Core/*.*" "Drivers/*.*" "Middlewares/*.*" "USB_DEVICE/*.*")
+add_definitions(-DUSE_HAL_DRIVER -DSTM32F446xx)
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F446RETX_FLASH.ld)
 
