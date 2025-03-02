@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.28.1)
 
 # project settings
 project(athenavi C CXX ASM)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_C_STANDARD 11)
 
 # hardware specific options
