@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 3.28.1)
 project(athenavi C CXX ASM)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # hardware specific options
 include(cmake/stm32f446xx.cmake)
