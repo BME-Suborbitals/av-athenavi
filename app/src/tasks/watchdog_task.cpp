@@ -4,6 +4,7 @@
 #include "portmacro.h"
 #include "projdefs.h"
 #include "rtos_task.h"
+#include "soft_assert.h"
 #include "stm32f446xx.h"
 #include "stm32f4xx_hal_conf.h"
 #include "stm32f4xx_hal_iwdg.h"
@@ -33,8 +34,9 @@ WatchdogTask::WatchdogTask(std::chrono::milliseconds task_timeout, UBaseType_t p
 }
 
 void WatchdogTask::RegisterTask(MonitoredTask* task) {
-    assert(task != nullptr);
-    monitored_tasks_.push_back(task);
+    if (soft_assert(task != nullptr)) {
+        monitored_tasks_.push_back(task);
+    }
 }
 
 }  // namespace tasks
