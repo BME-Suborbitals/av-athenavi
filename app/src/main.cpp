@@ -22,7 +22,9 @@ int main() {
     #ifdef SENSOR_MMC5986
     communication::I2CDevice i2c_mmc(hi2c1, 0x30);
     sensor::MMC5983MA mmc(&i2c_mmc);
-    mmc.Initialize(sensor::MMC5983MA::BANDWIDTH_100_HZ);
+    if(!mmc.Initialize(sensor::MMC5983MA::BANDWIDTH_100_HZ)){
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+    }
     #endif
 
     #ifdef SENSOR_BME280
@@ -34,7 +36,7 @@ int main() {
                        sensor::BME280::PowerMode::MODE_NORMAL,
                        sensor::BME280::StandbyTime::STANDBY_62_5_MS,
                        sensor::BME280::Filter::FILTER_2)){
-        // while(1);
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
     }
     #endif
 
@@ -47,7 +49,7 @@ int main() {
                          sensor::BMI088::ACC_ODR_100_HZ,
                          sensor::BMI088::GYRO_RANGE_2000_DPS,
                          sensor::BMI088::GYRO_ODR_1000_FBW_116)){
-        while(1);
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
     }
     #endif
     
