@@ -16,8 +16,6 @@ target_compile_options(freertos_config INTERFACE ${options})
 set(FREERTOS_PORT GCC_ARM_CM4F CACHE STRING "")
 set(FREERTOS_HEAP "4" CACHE STRING "" FORCE)
 
-include(FetchContent)
-
 FetchContent_Declare(
     FreeRTOS
     GIT_REPOSITORY https://github.com/FreeRTOS/FreeRTOS-Kernel.git

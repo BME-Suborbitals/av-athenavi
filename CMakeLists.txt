@@ -33,7 +33,6 @@ else ()
     list(FILTER GENERATED_SOURCES EXCLUDE REGEX ".*/Core/Src/syscalls.c")
     add_link_options(-lc -lrdimon -specs=rdimon.specs)
 endif ()
-
 include_directories(Core/Inc Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Middlewares/ST/STM32_USB_Device_Library/Core/Inc Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc USB_DEVICE/App USB_DEVICE/Target)
 
 add_definitions(-DUSE_HAL_DRIVER -DSTM32F446xx)
@@ -47,13 +46,16 @@ add_link_options(-T ${LINKER_SCRIPT})
 include(cmake/sources.cmake)
 add_executable(${PROJECT_NAME}.elf ${GENERATED_SOURCES} ${SOURCES} ${LINKER_SCRIPT})
 
+include(FetchContent)
 include(cmake/freertos.cmake)
+include(cmake/littlefs.cmake)
 
 add_subdirectory(app/lib/drivers)
 add_subdirectory(app/lib/utils)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE 
     drivers
     utils
+    littlefs
 )
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
