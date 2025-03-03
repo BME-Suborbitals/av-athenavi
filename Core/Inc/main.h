@@ -61,10 +61,6 @@ void Error_Handler(void);
 #define TIMEPULSE_GPIO_Port GPIOA
 #define GNSS_RST_Pin GPIO_PIN_1
 #define GNSS_RST_GPIO_Port GPIOA
-#define FLASH_HOLD_Pin GPIO_PIN_2
-#define FLASH_HOLD_GPIO_Port GPIOA
-#define FLASH_WP_Pin GPIO_PIN_3
-#define FLASH_WP_GPIO_Port GPIOA
 #define FLASH_CS_Pin GPIO_PIN_4
 #define FLASH_CS_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_6
