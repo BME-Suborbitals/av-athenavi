@@ -19,7 +19,7 @@ class DataProvider {
 template <typename T>
 inline void DataProvider<T>::NotifyListeners(const T& data) {
     for (auto subscriber : subscribers_) {
-        subscriber.OnDataReceived(data);
+        subscriber->OnDataReceived(data);
     }
 }
 
