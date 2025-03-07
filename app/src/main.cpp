@@ -8,6 +8,7 @@
 #include "spi_device.h"
 #include "stm32f4xx_hal.h"
 #include "tasks/bme280_task.h"
+#include "tasks/bmi088_task.h"
 #include "tasks/log_task.h"
 #include "tasks/watchdog_task.h"
 #include "usb_device.h"
@@ -37,8 +38,10 @@ int main() {
     static tasks::WatchdogTask watchdog_task{std::chrono::milliseconds(TASK_TIMEOUT)};
     static tasks::LogTask log_task{&flash, std::chrono::milliseconds(50), tskIDLE_PRIORITY, 1000};
     static tasks::BME280Task bme280_task;
+    static tasks::BMI088Task bmi088_task;
 
     bme280_task.RegisterListener(log_task);
+    bmi088_task.RegisterListener(log_task);
     watchdog_task.RegisterTask(static_cast<tasks::MonitoredTask*>(&log_task));
 
     vTaskStartScheduler();

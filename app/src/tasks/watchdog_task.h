@@ -13,7 +13,7 @@ namespace tasks {
 class WatchdogTask : public rtos::Task {
   private:
     std::chrono::milliseconds task_timeout_;
-    std::vector<MonitoredTask*> monitored_tasks_;
+    std::vector<MonitoredTask*> monitored_tasks_{};
 
   protected:
     void Run() override;

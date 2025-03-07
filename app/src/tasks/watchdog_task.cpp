@@ -1,6 +1,8 @@
 #include "watchdog_task.h"
 #include <cassert>
+#include <chrono>
 #include "iwdg.h"
+#include "monitored_task.h"
 #include "portmacro.h"
 #include "projdefs.h"
 #include "rtos_task.h"

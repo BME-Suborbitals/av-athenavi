@@ -3,6 +3,7 @@
 #include "FreeRTOSConfig.h"
 #include "communication/i2c_threadsafe.h"
 #include "i2c.h"
+#include "projdefs.h"
 #include "rtos_task.h"
 #include "tasks/data_observer.h"
 
@@ -22,6 +23,7 @@ void BME280Task::Run() {
         if (sensor_.Read(sensor_data)) {
             data_provider_.NotifyListeners(sensor_data);
         }
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 

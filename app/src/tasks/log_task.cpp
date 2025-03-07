@@ -70,8 +70,11 @@ void LogTask::Run() {
         xQueuePeek(magneto_queue_, &log_entry.magnetometer_data, 0);
         log_entry.timestamp = HAL_GetTick();
 
+        log_file.Write(&log_entry, sizeof(LogEntry));
+
         if (++sync_counter >= SYNC_INTERVAL) {
             log_file.Sync();
+            sync_counter = 0;
         }
 
         Heartbeat();
