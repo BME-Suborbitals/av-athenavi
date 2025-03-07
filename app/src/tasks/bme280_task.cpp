@@ -1,6 +1,7 @@
 #include "bme280_task.h"
 #include <cstdint>
 #include "FreeRTOSConfig.h"
+#include "bme280.h"
 #include "communication/i2c_threadsafe.h"
 #include "i2c.h"
 #include "projdefs.h"
