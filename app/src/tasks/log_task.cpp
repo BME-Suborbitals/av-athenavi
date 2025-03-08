@@ -4,7 +4,6 @@
 #include <cstddef>
 #include "bme280.h"
 #include "bmi088.h"
-#include "flash.h"
 #include "lfs.h"
 #include "littlefs.h"
 #include "littlefs_file.h"
@@ -21,7 +20,7 @@ namespace tasks {
 constexpr int SYNC_INTERVAL = 10;  // Number of log entries before syncing to disk
 
 size_t LogTask::UpdateBootCount_() {
-    littlefs::File boot_count_file("boot.cnt", file_system_);
+    littlefs::File boot_count_file("boot.cnt", *file_system_);
     boot_count_file.Open(LFS_O_RDWR | LFS_O_CREAT);
     size_t boot_count{0};
     auto read_result = boot_count_file.Read(&boot_count, sizeof(boot_count));
@@ -38,16 +37,14 @@ size_t LogTask::UpdateBootCount_() {
     return boot_count;
 }
 
-LogTask::LogTask(flash::Flash* flash, std::chrono::milliseconds log_frequency, UBaseType_t priority, StackType_t stack_size)
+LogTask::LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_frequency, UBaseType_t priority, StackType_t stack_size)
     : MonitoredTask("Log", stack_size, priority),
-      file_system_(flash),
+      file_system_(&file_system),
       log_frequency_(log_frequency),
       imu_queue_(xQueueCreate(1, sizeof(sensor::BMI088::Data))),
       env_queue_(xQueueCreate(1, sizeof(sensor::BME280::Data))),
       baro_queue_(xQueueCreate(1, sizeof(sensor::MS561101BA03::Data))),
-      magneto_queue_(xQueueCreate(1, sizeof(sensor::MMC5983MA::Data))) {
-    file_system_.Mount();
-}
+      magneto_queue_(xQueueCreate(1, sizeof(sensor::MMC5983MA::Data))) {}
 
 void LogTask::Run() {
     TickType_t last_wake_time = xTaskGetTickCount();
@@ -58,7 +55,7 @@ void LogTask::Run() {
 
     std::array<char, littlefs::MAX_PATH_LENGTH> log_file_name{0};
     sprintf(log_file_name.data(), "log-%d", boot_count);
-    littlefs::File log_file{log_file_name.data(), file_system_};
+    littlefs::File log_file{log_file_name.data(), *file_system_};
     log_file.Open(LFS_O_RDWR | LFS_O_CREAT);
 
     int sync_counter = 0;

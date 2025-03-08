@@ -33,4 +33,22 @@ bool I2CDeviceThreadsafe::Write(uint8_t register_address, uint8_t* buffer, size_
     xSemaphoreGive(bus_mutex);
     return result;
 }
+
+bool I2CDeviceThreadsafe::Read(uint8_t* buffer, size_t length, uint32_t timeout) {
+    if (xSemaphoreTake(bus_mutex, portMAX_DELAY) != pdTRUE) {
+        return false;
+    }
+    auto result = I2CDevice::Read(buffer, length, timeout);
+    xSemaphoreGive(bus_mutex);
+    return result;
+}
+
+bool I2CDeviceThreadsafe::Write(const uint8_t* buffer, size_t length, uint32_t timeout) {
+    if (xSemaphoreTake(bus_mutex, portMAX_DELAY) != pdTRUE) {
+        return false;
+    }
+    auto result = I2CDevice::Write(buffer, length, timeout);
+    xSemaphoreGive(bus_mutex);
+    return result;
+}
 }  // namespace communication

@@ -5,7 +5,6 @@
 #include "bme280.h"
 #include "bmi088.h"
 #include "data_observer.h"
-#include "flash.h"
 #include "littlefs.h"
 #include "mmc5983ma.h"
 #include "monitored_task.h"
@@ -29,7 +28,7 @@ class LogTask : public tasks::MonitoredTask,
                 public DataObserver<sensor::MMC5983MA::Data> {
   private:
     std::chrono::milliseconds log_frequency_;
-    littlefs::LittleFS file_system_;
+    littlefs::LittleFS* file_system_;
 
     QueueHandle_t imu_queue_;
     QueueHandle_t env_queue_;
@@ -40,7 +39,7 @@ class LogTask : public tasks::MonitoredTask,
     size_t UpdateBootCount_();
 
   public:
-    LogTask(flash::Flash* flash, std::chrono::milliseconds log_frequency, UBaseType_t priority, StackType_t stack_size);
+    LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_frequency, UBaseType_t priority, StackType_t stack_size);
     void Run() override;
     void OnDataReceived(const sensor::BMI088::Data& data);
     void OnDataReceived(const sensor::BME280::Data& data);

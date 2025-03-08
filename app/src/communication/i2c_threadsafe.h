@@ -18,6 +18,9 @@ class I2CDeviceThreadsafe : public I2CDevice {
     I2CDeviceThreadsafe(I2C_HandleTypeDef& i2c_handle, uint8_t device_address);
     bool Read(uint8_t register_address, uint8_t* buffer, size_t length, uint32_t timeout = MAX_TIMEOUT) override;
     bool Write(uint8_t register_address, uint8_t* buffer, size_t length, uint32_t timeout = MAX_TIMEOUT) override;
+
+    bool Read(uint8_t* buffer, size_t length, uint32_t timeout = MAX_TIMEOUT) override;
+    bool Write(const uint8_t* buffer, size_t length, uint32_t timeout = MAX_TIMEOUT) override;
 };
 }  // namespace communication
 
