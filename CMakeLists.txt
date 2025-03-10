@@ -33,6 +33,15 @@ else ()
     list(FILTER GENERATED_SOURCES EXCLUDE REGEX ".*/Core/Src/syscalls.c")
     add_link_options(-lc -lrdimon -specs=rdimon.specs)
 endif ()
+
+if (${DUMP_LOGS})
+    add_compile_options(-DDUMP_LOGS)
+endif()
+
+if(${FORMAT_FLASH}) 
+    add_compile_options(-DFORMAT_FLASH)
+endif()
+
 include_directories(Core/Inc Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include Middlewares/ST/STM32_USB_Device_Library/Core/Inc Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc USB_DEVICE/App USB_DEVICE/Target)
 
 add_definitions(-DUSE_HAL_DRIVER -DSTM32F446xx)

@@ -19,7 +19,7 @@ class WatchdogTask : public rtos::Task {
     void Run() override;
 
   public:
-    WatchdogTask(std::chrono::milliseconds task_timeout, UBaseType_t priority = configMAX_PRIORITIES - 1, StackType_t stack_size = configMINIMAL_STACK_SIZE);
+    WatchdogTask(std::chrono::milliseconds task_timeout, StackType_t stack_size = configMINIMAL_STACK_SIZE);
 
     /**
      * @brief Adds a task to be monitored.

@@ -3,15 +3,17 @@
 #include "FreeRTOSConfig.h"
 #include "communication/i2c_threadsafe.h"
 #include "i2c.h"
+#include "portmacro.h"
 #include "projdefs.h"
 #include "rtos_task.h"
+#include "task_configuration.h"
 #include "tasks/data_observer.h"
 
 namespace tasks {
 constexpr uint8_t MMC5983MA_DEVICE_ADDRESS = 0x30;
 
 MMC5983MATask::MMC5983MATask()
-    : rtos::Task("MMC5983MA", configMINIMAL_STACK_SIZE, tskIDLE_PRIORITY),
+    : rtos::Task("MMC5983MA", configMINIMAL_STACK_SIZE, static_cast<UBaseType_t>(Priority::SENSOR)),
       i2c_device_(hi2c1, MMC5983MA_DEVICE_ADDRESS),
       sensor_(&i2c_device_) {}
 

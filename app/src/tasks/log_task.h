@@ -16,7 +16,7 @@ namespace tasks {
 struct LogEntry {
     uint32_t timestamp;
     sensor::BMI088::Data imu_data;
-    sensor::BME280::Data environment_data;
+    // sensor::BME280::Data environment_data;
     sensor::MS561101BA03::Data barometric_data;
     sensor::MMC5983MA::Data magnetometer_data;
 };
@@ -39,7 +39,7 @@ class LogTask : public tasks::MonitoredTask,
     size_t UpdateBootCount_();
 
   public:
-    LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_frequency, UBaseType_t priority, StackType_t stack_size);
+    LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_frequency, StackType_t stack_size);
     void Run() override;
     void OnDataReceived(const sensor::BMI088::Data& data);
     void OnDataReceived(const sensor::BME280::Data& data);

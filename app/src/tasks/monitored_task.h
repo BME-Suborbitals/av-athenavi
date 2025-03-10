@@ -4,11 +4,13 @@
 #include "FreeRTOS.h"
 #include "portmacro.h"
 #include "rtos_task.h"
+#include "semphr.h"
 
 namespace tasks {
 class MonitoredTask : public rtos::Task {
   private:
     bool is_alive_{true};
+    SemaphoreHandle_t is_ready_;
 
   protected:
     /**
@@ -16,6 +18,9 @@ class MonitoredTask : public rtos::Task {
      * periodically to ensure the watchdog doesn't reset the system.
      */
     void Heartbeat();
+
+    void NotReady();
+    void Ready();
 
   public:
     MonitoredTask(const char* name, StackType_t stack_size, UBaseType_t priority);
@@ -31,6 +36,8 @@ class MonitoredTask : public rtos::Task {
      * before the next check.
      */
     void ExpireHeartbeat();
+
+    [[nodiscard]] bool WaitReady(uint32_t timeout = portMAX_DELAY);
 };
 }  // namespace tasks
 

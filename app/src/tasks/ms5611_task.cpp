@@ -1,11 +1,20 @@
 #include "ms5611_task.h"
+#include <cstdint>
+#include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
 #include "i2c.h"
+#include "portmacro.h"
+#include "projdefs.h"
+#include "rtos_task.h"
+#include "task.h"
+#include "task_configuration.h"
+#include "tasks/data_observer.h"
 
 namespace tasks {
 constexpr uint8_t MS5611_DEVICE_ADDRESS = 0x77;
 
 MS5611Task::MS5611Task()
-    : rtos::Task("MS5611", configMINIMAL_STACK_SIZE, tskIDLE_PRIORITY),
+    : rtos::Task("MS5611", configMINIMAL_STACK_SIZE, static_cast<UBaseType_t>(Priority::SENSOR)),
       i2c_device_(hi2c1, MS5611_DEVICE_ADDRESS),
       sensor_(&i2c_device_) {}
 

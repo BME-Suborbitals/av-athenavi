@@ -3,8 +3,10 @@
 #include "FreeRTOSConfig.h"
 #include "communication/i2c_threadsafe.h"
 #include "i2c.h"
+#include "portmacro.h"
 #include "projdefs.h"
 #include "rtos_task.h"
+#include "task_configuration.h"
 #include "tasks/data_observer.h"
 
 namespace tasks {
@@ -12,7 +14,7 @@ constexpr uint8_t BMI088_ACCELEROMETER_ADDRESS = 0x19;
 constexpr uint8_t BMI088_GYROSCOPE_ADDRESS = 0x69;
 
 BMI088Task::BMI088Task()
-    : rtos::Task("BMI088", configMINIMAL_STACK_SIZE, tskIDLE_PRIORITY),
+    : rtos::Task("BMI088", configMINIMAL_STACK_SIZE, static_cast<UBaseType_t>(Priority::SENSOR)),
       i2c_acc_(hi2c1, BMI088_ACCELEROMETER_ADDRESS),
       i2c_gyr_(hi2c1, BMI088_GYROSCOPE_ADDRESS),
       sensor_(&i2c_acc_, &i2c_gyr_) {}
