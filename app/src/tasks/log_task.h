@@ -13,6 +13,9 @@
 #include "queue.h"
 
 namespace tasks {
+/**
+ * @brief Structure containing all sensor data to be logged in a single entry
+ */
 struct LogEntry {
     uint32_t timestamp;
     sensor::BMI088::Data imu_data;
@@ -21,6 +24,9 @@ struct LogEntry {
     sensor::MMC5983MA::Data magnetometer_data;
 };
 
+/**
+ * @brief Task responsible for logging sensor data to the flash
+ */
 class LogTask : public tasks::MonitoredTask,
                 public DataObserver<sensor::BMI088::Data>,
                 public DataObserver<sensor::BME280::Data>,
@@ -35,15 +41,50 @@ class LogTask : public tasks::MonitoredTask,
     QueueHandle_t baro_queue_;
     QueueHandle_t magneto_queue_;
 
-    void LogData_();
+    /**
+     * @brief Increments and returns the boot count stored in the file system
+     * @return The updated boot count
+     */
     size_t UpdateBootCount_();
 
   public:
+    /**
+     * @brief Constructs a LogTask instance
+     * @param file_system Reference to the initialized LittleFS filesystem
+     * @param log_frequency How often data should be logged
+     * @param stack_size Size of the RTOS task stack in words
+     */
     LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_frequency, StackType_t stack_size);
+
+    /**
+     * @brief Main task execution function
+     * 
+     * This function implements the main logging loop that runs continuously
+     */
     void Run() override;
+
+    /**
+     * @brief Handler for receiving IMU data
+     * @param data The IMU sensor data
+     */
     void OnDataReceived(const sensor::BMI088::Data& data);
+
+    /**
+     * @brief Handler for receiving environmental data
+     * @param data The environmental sensor data
+     */
     void OnDataReceived(const sensor::BME280::Data& data);
+
+    /**
+     * @brief Handler for receiving barometric data
+     * @param data The barometric pressure sensor data
+     */
     void OnDataReceived(const sensor::MS561101BA03::Data& data);
+
+    /**
+     * @brief Handler for receiving magnetometer data
+     * @param data The magnetometer sensor data
+     */
     void OnDataReceived(const sensor::MMC5983MA::Data& data);
 };
 }  // namespace tasks
