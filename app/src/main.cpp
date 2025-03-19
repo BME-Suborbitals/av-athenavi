@@ -5,21 +5,29 @@
 #include "iwdg.h"
 #include "littlefs.h"
 #include "semihosting.h"
+#include "semihosting_stream.h"
 #include "spi.h"
 #include "spi_device.h"
 #include "stm32f4xx_hal.h"
 // #include "tasks/bme280_task.h"
 #include "littlefs_file.h"
-#include "tasks/bmi088_task.h"
-#include "tasks/log_task.h"
-#include "tasks/mmc5983ma_task.h"
-#include "tasks/ms5611_task.h"
-#include "tasks/task_configuration.h"
-#include "tasks/usb_task.h"
+// #include "tasks/bmi088_task.h"
+// #include "tasks/log_task.h"
+// #include "tasks/mmc5983ma_task.h"
+// #include "tasks/ms5611_task.h"
+// #include "tasks/task_configuration.h"
+// #include "tasks/usb_task.h"
 #include "tasks/watchdog_task.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "w25n01gv.h"
+
+#define GNSS_TEST
+#include "Serial.hpp"
+#include "TinyGps.hpp"
+#include "Gps.hpp"
+#include "usart.h"
+#include <cmath>
 
 extern "C" void SystemClock_Config(void);
 
@@ -31,8 +39,6 @@ int main() {
     MX_I2C1_Init();
     MX_SPI1_Init();
     MX_USB_DEVICE_Init();
-
-    SemihostingInit();
 
     static communication::SPIDevice flash_spi{&hspi1, FLASH_CS_GPIO_Port, FLASH_CS_Pin};  // NOLINT
     static flash::W25N01GV flash{&flash_spi};
@@ -62,6 +68,51 @@ int main() {
             log_file.Close();
         }
     });
+#elif defined(GNSS_TEST)
+
+    SemihostingInit();
+    mcu::semi << "New run\n";
+
+    Serial<256> serial1(&huart1);
+    TinyGps gps;
+
+    uint8_t oldGpsValue = 20;
+    uint8_t oldSecond = 0;
+    
+    SemihostingInit();
+
+    while (true) {
+        if (serial1.available()) {
+            gps.encode(serial1.read());
+          }
+
+    if (gps.location.isValid() && gps.location.isUpdated()) {
+        auto lat = static_cast<float>(gps.location.lat());
+        auto lng = static_cast<float>(gps.location.lng());
+        int32_t altitude = std::lround(gps.altitude.meters());
+  
+        if (lat != 0) {
+            mcu::semi << "lat = " << lat << "\tlon = " << lng << "\talt = " << altitude << "\n";
+        }
+      }
+  
+      /* Transmit GPS Satellite Information */
+      if (gps.satellites.isValid() && gps.satellites.isUpdated()) {
+        if (oldGpsValue != gps.satellites.value()) {
+          oldGpsValue = gps.satellites.value();
+          mcu::semi << "satellites value = " << gps.satellites.value() << "\n";
+        }
+      }
+  
+      /* Transmit GPS Time */
+      if (gps.time.isUpdated() && gps.time.isValid()) {
+        if (gps.time.second() != oldSecond) {
+          oldSecond = gps.time.second();
+          mcu::semi << gps.time.hour() << "h " << gps.time.minute() << "m " << gps.time.second() << "\n";
+        }
+      }
+    }
+
 #else
     static tasks::WatchdogTask watchdog_task{tasks::TASK_TIMEOUT};
     static tasks::LogTask log_task{file_system, tasks::LOG_FREQUENCY, 1000};
