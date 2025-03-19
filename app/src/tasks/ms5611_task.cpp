@@ -11,7 +11,7 @@
 #include "tasks/data_observer.h"
 
 namespace tasks {
-constexpr uint8_t MS5611_DEVICE_ADDRESS = 0x77;
+constexpr uint8_t MS5611_DEVICE_ADDRESS = 0x76;
 
 MS5611Task::MS5611Task()
     : rtos::Task("MS5611", configMINIMAL_STACK_SIZE, static_cast<UBaseType_t>(Priority::SENSOR)),
