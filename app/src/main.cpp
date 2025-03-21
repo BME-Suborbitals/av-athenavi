@@ -1,5 +1,7 @@
 #include "FreeRTOS.h"
 #include "communication/i2c_threadsafe.h"
+#include "communication/spi_threadsafe_dma.h"
+#include "dma.h"
 #include "gpio.h"
 #include "i2c.h"
 #include "iwdg.h"
@@ -15,7 +17,6 @@
 #include "tasks/mmc5983ma_task.h"
 #include "tasks/ms5611_task.h"
 #include "tasks/task_configuration.h"
-#include "tasks/usb_task.h"
 #include "tasks/watchdog_task.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
@@ -27,6 +28,7 @@ int main() {
     HAL_Init();
     SystemClock_Config();
 
+    MX_DMA_Init();
     MX_GPIO_Init();
     MX_I2C1_Init();
     MX_SPI1_Init();
@@ -34,7 +36,7 @@ int main() {
 
     SemihostingInit();
 
-    static communication::SPIDevice flash_spi{&hspi1, FLASH_CS_GPIO_Port, FLASH_CS_Pin};  // NOLINT
+    static communication::SPIThreadsafeDMA flash_spi{&hspi1, FLASH_CS_GPIO_Port, FLASH_CS_Pin};  // NOLINT
     static flash::W25N01GV flash{&flash_spi};
     flash.Initialize();
 

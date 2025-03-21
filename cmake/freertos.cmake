@@ -2,7 +2,7 @@ add_library(freertos_config INTERFACE)
 
 target_include_directories(freertos_config SYSTEM 
     INTERFACE
-    ${CMAKE_SOURCE_DIR/app/src}
+    ${CMAKE_SOURCE_DIR}/app/src
 )
 
 target_compile_definitions(freertos_config
