@@ -6,6 +6,8 @@ Checks: 'modernize-*,
   -bugprone-easily-swappable-parameters,
   cppcoreguidelines-*,
   -cppcoreguidelines-virtual-class-destructor,
+  -cppcoreguidelines-pro-type-const-cast,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
   misc-*, 
   portability-*,
   clang-analyzer-*,'

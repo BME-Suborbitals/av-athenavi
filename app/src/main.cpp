@@ -13,6 +13,7 @@
 // #include "tasks/bme280_task.h"
 #include "littlefs_file.h"
 #include "tasks/bmi088_task.h"
+#include "tasks/cli_task.h"
 #include "tasks/log_task.h"
 #include "tasks/mmc5983ma_task.h"
 #include "tasks/ms5611_task.h"
@@ -41,36 +42,15 @@ int main() {
     flash.Initialize();
 
     static littlefs::LittleFS file_system{&flash};
-#ifdef FORMAT_FLASH
-    file_system.Format();
-#endif
     file_system.Mount();
 
-#ifdef DUMP_LOGS
-    HAL_Delay(4000);
-    file_system.ForEachFile([](const littlefs::FileInfo& file) {
-        if (strncmp(file.name, "log-", 4) == 0) {
-            littlefs::File log_file{file.name, file_system};
-            log_file.Open(LFS_O_RDONLY);
-            tasks::LogEntry log_entry;
-            char buff[150];
-            size_t num_records = file.size / sizeof(log_entry);
-            for (size_t i = 0; i < num_records; i++) {
-                log_file.Read(&log_entry, sizeof(log_entry));
-                sprintf(buff, "%s;%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f\n", file.name, log_entry.timestamp, log_entry.imu_data.time, log_entry.imu_data.temperature, log_entry.imu_data.acceleration_x, log_entry.imu_data.acceleration_y, log_entry.imu_data.acceleration_z, log_entry.imu_data.angular_velocity_x, log_entry.imu_data.angular_velocity_y, log_entry.imu_data.angular_velocity_z, log_entry.barometric_data.pressure, log_entry.barometric_data.temperature, log_entry.magnetometer_data.magnetic_field_x, log_entry.magnetometer_data.magnetic_field_y, log_entry.magnetometer_data.magnetic_field_z);
-                CDC_Transmit_FS((uint8_t*)buff, strlen(buff));
-                HAL_Delay(1);
-            }
-            log_file.Close();
-        }
-    });
-#else
     static tasks::WatchdogTask watchdog_task{tasks::TASK_TIMEOUT};
     static tasks::LogTask log_task{file_system, tasks::LOG_FREQUENCY, 1000};
     // static tasks::BME280Task bme280_task;
     static tasks::MS5611Task ms5611_task;
     static tasks::BMI088Task bmi088_task;
     static tasks::MMC5983MATask mmc5983ma_task;
+    static tasks::CLITask cli_task{file_system};
 
     // bme280_task.RegisterListener(log_task);
     ms5611_task.RegisterListener(log_task);
@@ -79,6 +59,4 @@ int main() {
     watchdog_task.RegisterTask(static_cast<tasks::MonitoredTask*>(&log_task));
 
     vTaskStartScheduler();
-#endif
-    while (true) {}
 }
