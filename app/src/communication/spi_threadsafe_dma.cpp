@@ -67,8 +67,10 @@ void SPIThreadsafeDMA::Read(uint8_t* buffer, size_t length) {
         SPIDevice::Read(buffer, length);
         return;
     }
-    HAL_SPI_Receive_DMA(GetSPIHandle(), buffer, length);
-    xSemaphoreTake(GetDMASemaphore(GetSPIHandle()), portMAX_DELAY);
+    SPIHandle* spi_handle = GetSPIHandle();
+
+    HAL_SPI_Receive_DMA(spi_handle, buffer, length);
+    xSemaphoreTake(GetDMASemaphore(spi_handle), portMAX_DELAY);
 }
 
 void SPIThreadsafeDMA::Write(const uint8_t* buffer, size_t length) {
@@ -76,7 +78,9 @@ void SPIThreadsafeDMA::Write(const uint8_t* buffer, size_t length) {
         SPIDevice::Write(buffer, length);
         return;
     }
-    HAL_SPI_Transmit_DMA(GetSPIHandle(), buffer, length);
-    xSemaphoreTake(GetDMASemaphore(GetSPIHandle()), portMAX_DELAY);
+    SPIHandle* spi_handle = GetSPIHandle();
+
+    HAL_SPI_Transmit_DMA(spi_handle, buffer, length);
+    xSemaphoreTake(GetDMASemaphore(spi_handle), portMAX_DELAY);
 }
 }  // namespace communication

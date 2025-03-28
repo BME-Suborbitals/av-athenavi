@@ -193,7 +193,7 @@ void tasks::CLITask::ShowFlashCapacity_() {
 }
 
 tasks::CLITask::CLITask(littlefs::LittleFS& file_system)
-    : rtos::Task("USB", CLI_TASK_STACK_SIZE, static_cast<UBaseType_t>(Priority::CLI)),
+    : rtos::Task("USB", CLI_TASK_STACK, static_cast<UBaseType_t>(Priority::CLI)),
       file_system_(file_system) {
     RegisterCommand(
         "help",

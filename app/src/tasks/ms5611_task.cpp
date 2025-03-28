@@ -14,7 +14,7 @@ namespace tasks {
 constexpr uint8_t MS5611_DEVICE_ADDRESS = 0x76;
 
 MS5611Task::MS5611Task()
-    : rtos::Task("MS5611", configMINIMAL_STACK_SIZE, static_cast<UBaseType_t>(Priority::SENSOR)),
+    : rtos::Task("MS5611", SENSOR_TASK_STACK, static_cast<UBaseType_t>(Priority::SENSOR)),
       i2c_device_(hi2c1, MS5611_DEVICE_ADDRESS),
       sensor_(&i2c_device_) {}
 

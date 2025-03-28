@@ -8,6 +8,7 @@ Checks: 'modernize-*,
   -cppcoreguidelines-virtual-class-destructor,
   -cppcoreguidelines-pro-type-const-cast,
   -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-owning-memory,
   misc-*, 
   portability-*,
   clang-analyzer-*,'

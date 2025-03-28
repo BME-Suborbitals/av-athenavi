@@ -10,7 +10,9 @@ namespace tasks {
 constexpr std::chrono::milliseconds TASK_TIMEOUT(4500);
 constexpr std::chrono::milliseconds LOG_FREQUENCY(100);
 
-constexpr size_t CLI_TASK_STACK_SIZE = configMINIMAL_STACK_SIZE + 1000;
+constexpr StackType_t SENSOR_TASK_STACK = 500;
+constexpr StackType_t CLI_TASK_STACK = configMINIMAL_STACK_SIZE + 1000;
+constexpr StackType_t LOG_TASK_STACK = configMINIMAL_STACK_SIZE + 1000;
 
 enum class Priority : uint8_t {
     WATCHDOG = configMAX_PRIORITIES - 1,
