@@ -16,6 +16,7 @@
 #include "stm32f446xx.h"
 #include "task.h"
 #include "task_configuration.h"
+#include "tasks/task_manager.h"
 #include "usbd_cdc_if.h"
 #include "usbd_def.h"
 
@@ -230,6 +231,7 @@ void tasks::CLITask::Run() {
             Print_("Type 'help' for the list of available commands\n\n");
             Print_("> ");
             send_motd = false;
+            TaskManager::GetInstance().EnterMaintenanceMode();
         }
         GetCommand_();
     }

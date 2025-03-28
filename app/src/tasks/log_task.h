@@ -41,6 +41,8 @@ class LogTask : public tasks::MonitoredTask,
     QueueHandle_t baro_queue_;
     QueueHandle_t magneto_queue_;
 
+    SemaphoreHandle_t busy_mutex;
+
     /**
      * @brief Increments and returns the boot count stored in the file system
      * @return The updated boot count
@@ -62,6 +64,8 @@ class LogTask : public tasks::MonitoredTask,
      * This function implements the main logging loop that runs continuously
      */
     void Run() override;
+
+    void Suspend() override;
 
     /**
      * @brief Handler for receiving IMU data

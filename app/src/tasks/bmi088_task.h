@@ -15,7 +15,7 @@ namespace tasks {
  * This task periodically reads acceleration and gyroscope data from
  * the BMI088 sensor and distributes it to registered observers.
  */
-class BMI088Task : rtos::Task {
+class BMI088Task : public rtos::Task {
   private:
     DataProvider<sensor::BMI088::Data> data_provider_;
     communication::I2CDeviceThreadsafe i2c_acc_;

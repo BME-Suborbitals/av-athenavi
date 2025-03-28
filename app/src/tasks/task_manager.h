@@ -21,8 +21,9 @@ class TaskManager {
     tasks::CLITask* cli_task_{nullptr};
 
   public:
-    void Start(littlefs::LittleFS& file_system);
     static TaskManager& GetInstance();
+    void Start(littlefs::LittleFS& file_system);
+    void EnterMaintenanceMode();
 };
 }  // namespace tasks
 

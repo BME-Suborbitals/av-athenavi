@@ -19,6 +19,7 @@ class WatchdogTask : public rtos::Task {
   private:
     std::chrono::milliseconds task_timeout_;
     std::vector<MonitoredTask*> monitored_tasks_{};
+    bool is_enabled_{true};
 
   protected:
     /**
@@ -47,6 +48,9 @@ class WatchdogTask : public rtos::Task {
      * include it in the overall system health determination
      */
     void RegisterTask(MonitoredTask* task);
+
+    void Enable();
+    void Disable();
 };
 }  // namespace tasks
 

@@ -38,6 +38,14 @@ void TaskManager::Start(littlefs::LittleFS& file_system) {
     vTaskStartScheduler();
 }
 
+void TaskManager::EnterMaintenanceMode() {
+    watchdog_task_->Disable();
+    log_task_->Suspend();
+    bmi088_task_->Suspend();
+    ms5611_task_->Suspend();
+    mmc5983ma_task_->Suspend();
+}
+
 TaskManager& TaskManager::GetInstance() {
     return instance;
 }

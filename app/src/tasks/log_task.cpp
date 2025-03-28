@@ -47,7 +47,8 @@ LogTask::LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_
       imu_queue_(xQueueCreate(1, sizeof(sensor::BMI088::Data))),
       env_queue_(xQueueCreate(1, sizeof(sensor::BME280::Data))),
       baro_queue_(xQueueCreate(1, sizeof(sensor::MS561101BA03::Data))),
-      magneto_queue_(xQueueCreate(1, sizeof(sensor::MMC5983MA::Data))) {
+      magneto_queue_(xQueueCreate(1, sizeof(sensor::MMC5983MA::Data))),
+      busy_mutex(xSemaphoreCreateMutex()) {
     NotReady();
 }
 
@@ -74,6 +75,10 @@ void LogTask::Run() {
         xQueuePeek(magneto_queue_, &log_entry.magnetometer_data, 0);
         log_entry.timestamp = HAL_GetTick();
 
+        if (xSemaphoreTake(busy_mutex, portMAX_DELAY) != pdTRUE) {
+            continue;
+        }
+
         log_file.Write(&log_entry, sizeof(LogEntry));
 
         if (++sync_counter >= SYNC_INTERVAL) {
@@ -83,7 +88,15 @@ void LogTask::Run() {
         }
 
         Heartbeat();
+        xSemaphoreGive(busy_mutex);
         vTaskDelay(delay_ticks);
+    }
+}
+
+void LogTask::Suspend() {
+    if (xSemaphoreTake(busy_mutex, portMAX_DELAY) == pdTRUE) {
+        rtos::Task::Suspend();
+        xSemaphoreGive(busy_mutex);
     }
 }
 
