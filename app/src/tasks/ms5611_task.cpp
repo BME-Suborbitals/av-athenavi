@@ -19,6 +19,9 @@ MS5611Task::MS5611Task()
       sensor_(&i2c_device_) {}
 
 void MS5611Task::Run() {
+    TickType_t last_wake_time = xTaskGetTickCount();
+    const TickType_t delay_ticks = pdMS_TO_TICKS(BARO_FREQUENCY.count());
+
     sensor_.Initialize();
 
     sensor::MS561101BA03::Data sensor_data{};
@@ -26,7 +29,7 @@ void MS5611Task::Run() {
         if (sensor_.Read(sensor_data)) {
             data_provider_.NotifyListeners(sensor_data);
         }
-        vTaskDelay(pdMS_TO_TICKS(50));
+        xTaskDelayUntil(&last_wake_time, delay_ticks);
     }
 }
 

@@ -1,6 +1,7 @@
 #ifndef TASK_MANAGER_H
 #define TASK_MANAGER_H
 
+#include "tasks/bme280_task.h"
 #include "tasks/bmi088_task.h"
 #include "tasks/cli_task.h"
 #include "tasks/log_task.h"
@@ -13,6 +14,7 @@ class TaskManager {
   private:
     TaskManager() = default;
     static TaskManager instance;
+    tasks::BME280Task* bme280_task_{nullptr};
     tasks::BMI088Task* bmi088_task_{nullptr};
     tasks::MMC5983MATask* mmc5983ma_task_{nullptr};
     tasks::MS5611Task* ms5611_task_{nullptr};

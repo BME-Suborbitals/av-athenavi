@@ -2,6 +2,7 @@
 #define LOG_TASK_H
 
 #include <chrono>
+#include <variant>
 #include "bme280.h"
 #include "bmi088.h"
 #include "data_observer.h"
@@ -18,10 +19,12 @@ namespace tasks {
  */
 struct LogEntry {
     uint32_t timestamp;
-    sensor::BMI088::Data imu_data;
-    // sensor::BME280::Data environment_data;
-    sensor::MS561101BA03::Data barometric_data;
-    sensor::MMC5983MA::Data magnetometer_data;
+    std::variant<
+        sensor::BMI088::Data,
+        sensor::BME280::Data,
+        sensor::MS561101BA03::Data,
+        sensor::MMC5983MA::Data>
+        data;
 };
 
 /**
@@ -36,10 +39,7 @@ class LogTask : public tasks::MonitoredTask,
     std::chrono::milliseconds log_frequency_;
     littlefs::LittleFS* file_system_;
 
-    QueueHandle_t imu_queue_;
-    QueueHandle_t env_queue_;
-    QueueHandle_t baro_queue_;
-    QueueHandle_t magneto_queue_;
+    QueueHandle_t giga_buffer_;
 
     SemaphoreHandle_t busy_mutex;
 

@@ -28,7 +28,9 @@ void tasks::CLITask::GetCommand_() {
     std::string input{reinterpret_cast<char*>(UserRxBufferFS)};
     memset(static_cast<uint8_t*>(UserRxBufferFS), 0, APP_RX_DATA_SIZE);
 
-    Print_(input.c_str());
+    if (!input.empty()) {
+        Print_(input.c_str());
+    }
 
     // Skip leading whitespace
     size_t start = 0;
@@ -154,7 +156,56 @@ void tasks::CLITask::DumpLog_(std::vector<std::string>& args) {
     std::expected<size_t, littlefs::LFSError> read_result = 1;
     while (read_result.has_value() && read_result.value() > 0) {
         read_result = log_file.Read(&log_entry, sizeof(log_entry));
-        sprintf(buff.data(), "%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f\n", log_entry.timestamp, log_entry.imu_data.time, log_entry.imu_data.temperature, log_entry.imu_data.acceleration_x, log_entry.imu_data.acceleration_y, log_entry.imu_data.acceleration_z, log_entry.imu_data.angular_velocity_x, log_entry.imu_data.angular_velocity_y, log_entry.imu_data.angular_velocity_z, log_entry.barometric_data.pressure, log_entry.barometric_data.temperature, log_entry.magnetometer_data.magnetic_field_x, log_entry.magnetometer_data.magnetic_field_y, log_entry.magnetometer_data.magnetic_field_z);
+        std::visit([this, &buff, &log_entry](const auto& data) {
+            using DataType = std::decay_t<decltype(data)>;
+
+            if constexpr (std::is_same_v<DataType, sensor::BMI088::Data>) {
+                sprintf(
+                    buff.data(),
+                    "%lu;IMU;%f;%f;%f;%f;%f;%f;%f;%f\r\n",
+                    log_entry.timestamp,
+                    data.time,
+                    data.temperature,
+                    data.acceleration_x,
+                    data.acceleration_y,
+                    data.acceleration_z,
+                    data.angular_velocity_x,
+                    data.angular_velocity_y,
+                    data.angular_velocity_z
+                );
+            }
+            else if constexpr (std::is_same_v<DataType, sensor::BME280::Data>) {
+                sprintf(
+                    buff.data(),
+                    "%lu;ENV;%f;%f;%f;;;;;\r\n",
+                    log_entry.timestamp,
+                    data.temperature,
+                    data.pressure,
+                    data.humidity
+                );
+            }
+            else if constexpr (std::is_same_v<DataType, sensor::MMC5983MA::Data>) {
+                sprintf(
+                    buff.data(),
+                    "%lu;MAG;%f;%f;%f;;;;;\r\n",
+                    log_entry.timestamp,
+                    data.magnetic_field_x,
+                    data.magnetic_field_y,
+                    data.magnetic_field_z
+                );
+            }
+            else if constexpr (std::is_same_v<DataType, sensor::MS561101BA03::Data>) {
+                sprintf(
+                    buff.data(),
+                    "%lu;BARO;%f;%f;;;;;;\r\n",
+                    log_entry.timestamp,
+                    data.pressure,
+                    data.temperature
+                );
+            }
+        },
+                   log_entry.data);
+        // sprintf(buff.data(), "%d\n", log_entry.timestamp);
         CDC_Transmit_FS((uint8_t*)buff.data(), strlen(buff.data()));
     }
     log_file.Close();
