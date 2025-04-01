@@ -10,10 +10,11 @@ namespace tasks {
 constexpr std::chrono::milliseconds TASK_TIMEOUT(4500);
 constexpr std::chrono::milliseconds LOG_FREQUENCY(50);
 
-constexpr std::chrono::milliseconds IMU_FREQUENCY(25);
+constexpr std::chrono::milliseconds IMU_FREQUENCY(40);
 constexpr std::chrono::milliseconds ENV_FREQUENCY(250);
-constexpr std::chrono::milliseconds BARO_FREQUENCY(50);
-constexpr std::chrono::milliseconds MAGNETO_FREQUENCY(50);
+constexpr std::chrono::milliseconds BARO_FREQUENCY(60);
+constexpr std::chrono::milliseconds MAGNETO_FREQUENCY(60);
+constexpr std::chrono::milliseconds PITOT_FREQUENCY(100);
 
 constexpr StackType_t SENSOR_TASK_STACK = 500;
 constexpr StackType_t CLI_TASK_STACK = configMINIMAL_STACK_SIZE + 1000;

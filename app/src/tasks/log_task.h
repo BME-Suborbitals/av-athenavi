@@ -10,6 +10,7 @@
 #include "mmc5983ma.h"
 #include "monitored_task.h"
 #include "ms561101ba03.h"
+#include "pitot_task.h"
 #include "portmacro.h"
 #include "queue.h"
 
@@ -23,7 +24,8 @@ struct LogEntry {
         sensor::BMI088::Data,
         sensor::BME280::Data,
         sensor::MS561101BA03::Data,
-        sensor::MMC5983MA::Data>
+        sensor::MMC5983MA::Data,
+        PitotTask::PitotData>
         data;
 };
 
@@ -34,7 +36,8 @@ class LogTask : public tasks::MonitoredTask,
                 public DataObserver<sensor::BMI088::Data>,
                 public DataObserver<sensor::BME280::Data>,
                 public DataObserver<sensor::MS561101BA03::Data>,
-                public DataObserver<sensor::MMC5983MA::Data> {
+                public DataObserver<sensor::MMC5983MA::Data>,
+                public DataObserver<PitotTask::PitotData> {
   private:
     std::chrono::milliseconds log_frequency_;
     littlefs::LittleFS* file_system_;
@@ -90,6 +93,8 @@ class LogTask : public tasks::MonitoredTask,
      * @param data The magnetometer sensor data
      */
     void OnDataReceived(const sensor::MMC5983MA::Data& data);
+
+    void OnDataReceived(const PitotTask::PitotData& data);
 };
 }  // namespace tasks
 

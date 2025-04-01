@@ -1,3 +1,4 @@
+#include "adc.h"
 #include "communication/spi_threadsafe_dma.h"
 #include "dma.h"
 #include "gpio.h"
@@ -16,6 +17,7 @@ int main() {
     HAL_Init();
     SystemClock_Config();
 
+    MX_ADC1_Init();
     MX_DMA_Init();
     MX_GPIO_Init();
     MX_I2C1_Init();

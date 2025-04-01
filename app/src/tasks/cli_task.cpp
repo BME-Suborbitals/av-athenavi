@@ -203,6 +203,15 @@ void tasks::CLITask::DumpLog_(std::vector<std::string>& args) {
                     data.temperature
                 );
             }
+            else if constexpr (std::is_same_v<DataType, PitotTask::PitotData>) {
+                sprintf(
+                    buff.data(),
+                    "%lu;DIFF;%hu;%hu\r\n",
+                    log_entry.timestamp,
+                    data.channel1,
+                    data.channel2
+                );
+            }
         },
                    log_entry.data);
         // sprintf(buff.data(), "%d\n", log_entry.timestamp);

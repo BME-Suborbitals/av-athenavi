@@ -113,7 +113,7 @@ void LogTask::OnDataReceived(const sensor::BMI088::Data& data) {
         .timestamp = HAL_GetTick(),
         .data = data
     };
-    xQueueSend(giga_buffer_, &entry, portMAX_DELAY);
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 
 void LogTask::OnDataReceived(const sensor::BME280::Data& data) {
@@ -121,7 +121,7 @@ void LogTask::OnDataReceived(const sensor::BME280::Data& data) {
         .timestamp = HAL_GetTick(),
         .data = data
     };
-    xQueueSend(giga_buffer_, &entry, portMAX_DELAY);
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 
 void LogTask::OnDataReceived(const sensor::MS561101BA03::Data& data) {
@@ -129,7 +129,7 @@ void LogTask::OnDataReceived(const sensor::MS561101BA03::Data& data) {
         .timestamp = HAL_GetTick(),
         .data = data
     };
-    xQueueSend(giga_buffer_, &entry, portMAX_DELAY);
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 
 void LogTask::OnDataReceived(const sensor::MMC5983MA::Data& data) {
@@ -137,6 +137,14 @@ void LogTask::OnDataReceived(const sensor::MMC5983MA::Data& data) {
         .timestamp = HAL_GetTick(),
         .data = data
     };
-    xQueueSend(giga_buffer_, &entry, portMAX_DELAY);
+    xQueueSend(giga_buffer_, &entry, 0);
+}
+
+void LogTask::OnDataReceived(const PitotTask::PitotData& data) {
+    LogEntry entry{
+        .timestamp = HAL_GetTick(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 }  // namespace tasks
