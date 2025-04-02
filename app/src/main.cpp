@@ -4,8 +4,8 @@
 #include "i2c.h"
 #include "iwdg.h"
 #include "littlefs.h"
-// #include "semihosting.h"
-// #include "semihosting_stream.h"
+#include "semihosting.h"
+#include "semihosting_stream.h"
 #include "spi.h"
 #include "spi_device.h"
 #include "stm32f4xx_hal.h"
@@ -22,7 +22,6 @@
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "w25n01gv.h"
-#include "serial.h"
 #include "uart_device.h"
 
 extern "C" void SystemClock_Config(void);
@@ -40,8 +39,8 @@ int main() {
 
     // SemihostingInit();
 
-    // mcu::semi << "\nNew run\n";
-    usb_debug::println("New run");
+    mcu::semi << "\nNew run\n";
+    // usb_debug::println("New run");
     // static communication::SPIDevice flash_spi{&hspi1,        , FLASH_CS_Pin};  // NOLINT
     // static flash::W25N01GV flash{&flash_spi};
     // flash.Initialize();
