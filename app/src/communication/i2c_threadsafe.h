@@ -19,10 +19,6 @@ namespace communication {
  * or cause bus contention.
  */
 class I2CDeviceThreadsafe : public I2CDevice {
-  private:
-    // TODO: Separate mutexes for different buses
-    static SemaphoreHandle_t bus_mutex;
-
   public:
     /**
      * @brief Constructs an I2CDeviceThreadsafe instance

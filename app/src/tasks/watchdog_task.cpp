@@ -28,11 +28,13 @@ void WatchdogTask::Run() {
     const TickType_t delay_ticks = pdMS_TO_TICKS(task_timeout_.count());
 
     while (true) {
-        for (auto* task : monitored_tasks_) {
-            if (!task->IsAlive()) {
-                NVIC_SystemReset();
+        if (is_enabled_) {
+            for (auto* task : monitored_tasks_) {
+                if (!task->IsAlive()) {
+                    NVIC_SystemReset();
+                }
+                task->ExpireHeartbeat();
             }
-            task->ExpireHeartbeat();
         }
         HAL_IWDG_Refresh(&hiwdg);
         (void)xTaskDelayUntil(&last_wake_time, delay_ticks);
@@ -47,6 +49,14 @@ void WatchdogTask::RegisterTask(MonitoredTask* task) {
     if (soft_assert(task != nullptr)) {
         monitored_tasks_.push_back(task);
     }
+}
+
+void WatchdogTask::Enable() {
+    is_enabled_ = true;
+}
+
+void WatchdogTask::Disable() {
+    is_enabled_ = false;
 }
 
 }  // namespace tasks

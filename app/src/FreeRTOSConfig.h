@@ -66,7 +66,7 @@ void xPortSysTickHandler(void);
 #define configTICK_RATE_HZ ((TickType_t)1000)
 #define configMAX_PRIORITIES (56)
 #define configMINIMAL_STACK_SIZE ((uint16_t)128)
-#define configTOTAL_HEAP_SIZE ((size_t)15360)
+#define configTOTAL_HEAP_SIZE ((size_t)55360)
 #define configMAX_TASK_NAME_LEN (16)
 #define configUSE_TRACE_FACILITY 1
 #define configUSE_16_BIT_TICKS 0
@@ -156,7 +156,7 @@ header file. */
 standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-
+#define xPortSysTickHandler SysTick_Handler
 /* IMPORTANT: After 10.3.1 update, Systick_Handler comes from NVIC (if SYS timebase = systick), otherwise from cmsis_os2.c */
 
 #define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1

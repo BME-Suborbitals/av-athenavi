@@ -30,7 +30,7 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include <stdbool.h>
 /* USER CODE END INCLUDE */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -94,6 +94,7 @@ extern USBD_CDC_ItfTypeDef USBD_Interface_fops_FS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
   extern uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
+  extern bool send_motd;
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**

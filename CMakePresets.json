@@ -38,20 +38,6 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "MinSizeRel"
 			}
-		},
-		{
-			"name": "Dump Flash",
-			"inherits": "Debug",
-			"cacheVariables": {
-				"DUMP_LOGS": "ON"
-			}
-		},
-		{
-			"name": "Format Flash",
-			"inherits": "Debug",
-			"cacheVariables": {
-				"FORMAT_FLASH": "ON"
-			}
 		}
 	],
 	"buildPresets": [
@@ -70,10 +56,6 @@
 		{
 			"name": "MinSizeRel",
 			"configurePreset": "MinSizeRel"
-		},
-		{
-			"name": "Dump Flash",
-			"configurePreset": "Dump Flash"
 		}
 	]
 }

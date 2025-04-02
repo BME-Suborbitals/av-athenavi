@@ -21,6 +21,7 @@
 
 namespace tasks {
 constexpr int SYNC_INTERVAL = 10;  // Number of log entries before syncing to disk
+constexpr size_t BULK_SIZE = 2048 / sizeof(LogEntry);
 
 size_t LogTask::UpdateBootCount_() {
     littlefs::File boot_count_file("boot.cnt", *file_system_);
@@ -44,10 +45,8 @@ LogTask::LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_
     : MonitoredTask("Log", stack_size, static_cast<UBaseType_t>(Priority::LOG)),
       file_system_(&file_system),
       log_frequency_(log_frequency),
-      imu_queue_(xQueueCreate(1, sizeof(sensor::BMI088::Data))),
-      env_queue_(xQueueCreate(1, sizeof(sensor::BME280::Data))),
-      baro_queue_(xQueueCreate(1, sizeof(sensor::MS561101BA03::Data))),
-      magneto_queue_(xQueueCreate(1, sizeof(sensor::MMC5983MA::Data))) {
+      giga_buffer_(xQueueCreate(100, sizeof(LogEntry))),
+      busy_mutex(xSemaphoreCreateMutex()) {
     NotReady();
 }
 
@@ -62,44 +61,90 @@ void LogTask::Run() {
     littlefs::File log_file{log_file_name.data(), *file_system_};
     log_file.Open(LFS_O_RDWR | LFS_O_CREAT);
 
-    int sync_counter = 0;
-    LogEntry log_entry{};
-
     Ready();
 
+    int sync_counter = 0;
+    LogEntry output_buffer[BULK_SIZE];
+
     while (true) {
-        xQueuePeek(imu_queue_, &log_entry.imu_data, 0);
-        // xQueuePeek(env_queue_, &log_entry.environment_data, 0);
-        xQueuePeek(baro_queue_, &log_entry.barometric_data, 0);
-        xQueuePeek(magneto_queue_, &log_entry.magnetometer_data, 0);
-        log_entry.timestamp = HAL_GetTick();
 
-        log_file.Write(&log_entry, sizeof(LogEntry));
+        size_t items_collected = 0;
 
-        if (++sync_counter >= SYNC_INTERVAL) {
-            log_file.Sync();
-            sync_counter = 0;
-            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+        // Try to fill the buffer
+        while (items_collected < BULK_SIZE) {
+            if (xQueueReceive(giga_buffer_, &output_buffer[items_collected], 0) == pdTRUE) {
+                items_collected++;
+            }
+            else {
+                break;  // No more data available
+            }
+        }
+
+        if (xSemaphoreTake(busy_mutex, portMAX_DELAY) != pdTRUE) {
+            continue;
+        }
+
+        if (items_collected > 0) {
+            log_file.Write(output_buffer, items_collected * sizeof(LogEntry));
+            if (++sync_counter >= SYNC_INTERVAL) {
+                log_file.Sync();
+                sync_counter = 0;
+                HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+            }
         }
 
         Heartbeat();
-        vTaskDelay(delay_ticks);
+        xSemaphoreGive(busy_mutex);
+        if (items_collected == 0) {
+            vTaskDelay(delay_ticks);
+        }
+    }
+}
+
+void LogTask::Suspend() {
+    if (xSemaphoreTake(busy_mutex, portMAX_DELAY) == pdTRUE) {
+        rtos::Task::Suspend();
+        xSemaphoreGive(busy_mutex);
     }
 }
 
 void LogTask::OnDataReceived(const sensor::BMI088::Data& data) {
-    xQueueOverwrite(imu_queue_, &data);
+    LogEntry entry{
+        .timestamp = HAL_GetTick(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 
 void LogTask::OnDataReceived(const sensor::BME280::Data& data) {
-    // xQueueOverwrite(env_queue_, &data);
+    LogEntry entry{
+        .timestamp = HAL_GetTick(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 
 void LogTask::OnDataReceived(const sensor::MS561101BA03::Data& data) {
-    xQueueOverwrite(baro_queue_, &data);
+    LogEntry entry{
+        .timestamp = HAL_GetTick(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 
 void LogTask::OnDataReceived(const sensor::MMC5983MA::Data& data) {
-    xQueueOverwrite(magneto_queue_, &data);
+    LogEntry entry{
+        .timestamp = HAL_GetTick(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
+}
+
+void LogTask::OnDataReceived(const PitotTask::PitotData& data) {
+    LogEntry entry{
+        .timestamp = HAL_GetTick(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
 }
 }  // namespace tasks
