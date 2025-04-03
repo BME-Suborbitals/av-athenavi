@@ -10,6 +10,7 @@
 #include "littlefs.h"
 #include "littlefs_file.h"
 #include "log_task.h"
+#include "maxf10s.h"
 #include "portmacro.h"
 #include "projdefs.h"
 #include "rtos_task.h"
@@ -201,6 +202,19 @@ void tasks::CLITask::DumpLog_(std::vector<std::string>& args) {
                     log_entry.timestamp,
                     data.pressure,
                     data.temperature
+                );
+            }
+            else if constexpr (std::is_same_v<DataType, gnss::MAXF10S::Data>) {
+                sprintf(
+                    buff.data(),
+                    "%lu;GNSS;%f;%f;%f;%f;%d;%f\n",
+                    log_entry.timestamp,
+                    data.time,
+                    data.lat,
+                    data.lon,
+                    data.alt,
+                    data.satnum,
+                    data.dilution
                 );
             }
         },

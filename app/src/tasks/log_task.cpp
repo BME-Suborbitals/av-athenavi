@@ -8,6 +8,7 @@
 #include "littlefs.h"
 #include "littlefs_file.h"
 #include "main.h"
+#include "maxf10s.h"
 #include "mmc5983ma.h"
 #include "monitored_task.h"
 #include "ms561101ba03.h"
@@ -20,8 +21,8 @@
 #include "task_configuration.h"
 
 namespace tasks {
-constexpr int SYNC_INTERVAL = 10;  // Number of log entries before syncing to disk
-constexpr size_t BULK_SIZE = 2048 / sizeof(LogEntry);
+constexpr int SYNC_INTERVAL = 100;  // Number of log entries before syncing to disk
+constexpr size_t BULK_SIZE = 1024 / sizeof(LogEntry);
 
 size_t LogTask::UpdateBootCount_() {
     littlefs::File boot_count_file("boot.cnt", *file_system_);
@@ -45,7 +46,7 @@ LogTask::LogTask(littlefs::LittleFS& file_system, std::chrono::milliseconds log_
     : MonitoredTask("Log", stack_size, static_cast<UBaseType_t>(Priority::LOG)),
       file_system_(&file_system),
       log_frequency_(log_frequency),
-      giga_buffer_(xQueueCreate(100, sizeof(LogEntry))),
+      giga_buffer_(xQueueCreate(BULK_SIZE * 8, sizeof(LogEntry))),
       busy_mutex(xSemaphoreCreateMutex()) {
     NotReady();
 }
@@ -72,7 +73,7 @@ void LogTask::Run() {
 
         // Try to fill the buffer
         while (items_collected < BULK_SIZE) {
-            if (xQueueReceive(giga_buffer_, &output_buffer[items_collected], 0) == pdTRUE) {
+            if (xQueueReceive(giga_buffer_, &output_buffer[items_collected], 100) == pdTRUE) {
                 items_collected++;
             }
             else {
@@ -86,10 +87,10 @@ void LogTask::Run() {
 
         if (items_collected > 0) {
             log_file.Write(output_buffer, items_collected * sizeof(LogEntry));
+            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
             if (++sync_counter >= SYNC_INTERVAL) {
                 log_file.Sync();
                 sync_counter = 0;
-                HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
             }
         }
 
@@ -110,15 +111,17 @@ void LogTask::Suspend() {
 
 void LogTask::OnDataReceived(const sensor::BMI088::Data& data) {
     LogEntry entry{
-        .timestamp = HAL_GetTick(),
+        .timestamp = xTaskGetTickCount(),
         .data = data
     };
-    xQueueSend(giga_buffer_, &entry, 0);
+    if (xQueueSend(giga_buffer_, &entry, 0) != pdTRUE) {
+        mcu::semi << "Lost imu data\n";
+    }
 }
 
 void LogTask::OnDataReceived(const sensor::BME280::Data& data) {
     LogEntry entry{
-        .timestamp = HAL_GetTick(),
+        .timestamp = xTaskGetTickCount(),
         .data = data
     };
     xQueueSend(giga_buffer_, &entry, 0);
@@ -126,7 +129,7 @@ void LogTask::OnDataReceived(const sensor::BME280::Data& data) {
 
 void LogTask::OnDataReceived(const sensor::MS561101BA03::Data& data) {
     LogEntry entry{
-        .timestamp = HAL_GetTick(),
+        .timestamp = xTaskGetTickCount(),
         .data = data
     };
     xQueueSend(giga_buffer_, &entry, 0);
@@ -134,7 +137,15 @@ void LogTask::OnDataReceived(const sensor::MS561101BA03::Data& data) {
 
 void LogTask::OnDataReceived(const sensor::MMC5983MA::Data& data) {
     LogEntry entry{
-        .timestamp = HAL_GetTick(),
+        .timestamp = xTaskGetTickCount(),
+        .data = data
+    };
+    xQueueSend(giga_buffer_, &entry, 0);
+}
+
+void LogTask::OnDataReceived(const gnss::MAXF10S::Data& data) {
+    LogEntry entry{
+        .timestamp = xTaskGetTickCount(),
         .data = data
     };
     xQueueSend(giga_buffer_, &entry, 0);
