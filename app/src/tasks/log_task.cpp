@@ -139,12 +139,4 @@ void LogTask::OnDataReceived(const sensor::MMC5983MA::Data& data) {
     };
     xQueueSend(giga_buffer_, &entry, 0);
 }
-
-void LogTask::OnDataReceived(const PitotTask::PitotData& data) {
-    LogEntry entry{
-        .timestamp = HAL_GetTick(),
-        .data = data
-    };
-    xQueueSend(giga_buffer_, &entry, 0);
-}
 }  // namespace tasks

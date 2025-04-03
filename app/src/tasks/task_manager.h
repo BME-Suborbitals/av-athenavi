@@ -7,7 +7,6 @@
 #include "tasks/log_task.h"
 #include "tasks/mmc5983ma_task.h"
 #include "tasks/ms5611_task.h"
-#include "tasks/pitot_task.h"
 #include "tasks/watchdog_task.h"
 
 namespace tasks {
@@ -19,7 +18,6 @@ class TaskManager {
     tasks::BMI088Task* bmi088_task_{nullptr};
     tasks::MMC5983MATask* mmc5983ma_task_{nullptr};
     tasks::MS5611Task* ms5611_task_{nullptr};
-    tasks::PitotTask* pitot_task_{nullptr};
     tasks::LogTask* log_task_{nullptr};
     tasks::WatchdogTask* watchdog_task_{nullptr};
     tasks::CLITask* cli_task_{nullptr};
