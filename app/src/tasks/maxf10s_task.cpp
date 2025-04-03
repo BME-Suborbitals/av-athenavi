@@ -6,24 +6,27 @@
 #include "rtos_task.h"
 #include "task_configuration.h"
 #include "tasks/data_observer.h"
+#include "uart_device.h"
+#include "semihosting.h"
+#include "semihosting_stream.h"
 
 namespace tasks {
-MAXF10STask::MAXF10STask()
-    : rtos::Task("MAXF10S", 2000, static_cast<UBaseType_t>(Priority::SENSOR)) { }
+MAXF10STask::MAXF10STask(communication::UARTDevice* uart)
+    : rtos::Task("MAXF10S", 2000, static_cast<UBaseType_t>(Priority::SENSOR)),
+    gnss_(uart){ }
 
 void MAXF10STask::Run() {
     gnss_.Initialize();
 
-    // std::vector<gnss::MAXF10S::Data> gnss_data{};
-    std::vector<gnss::MAXF10S::Data> gnss_data;
+    gnss::MAXF10S::Data gnss_data;
+
     while (true) {
 
         if (gnss_.Read(gnss_data)) {
-            for(int i = 0; i < gnss_data.size(); i++){
-                data_provider_.NotifyListeners(gnss_data[i]);
-            }
+            data_provider_.NotifyListeners(gnss_data);
         }
-        vTaskDelay(pdMS_TO_TICKS(50));
+
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 
