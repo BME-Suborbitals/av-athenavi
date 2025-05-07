@@ -38,5 +38,5 @@ int main() {
     static littlefs::LittleFS file_system{&flash};
     file_system.Mount();
 
-    tasks::TaskManager::GetInstance().Start(file_system);
+    tasks::TaskManager::GetInstance().Start(file_system);   
 }

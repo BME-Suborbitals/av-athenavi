@@ -60,7 +60,13 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+// void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+//   UNUSED(huart);
+//   // gnss::MAXF10S::SetReceived(1);
+//   // gnss::MAXF10S::SetIdx(Size);
+//   // gnss::MAXF10S::received = 1;
+//   // gnss::MAXF10S::idx = Size;
+// }
 /* USER CODE END 0 */
 
 /**

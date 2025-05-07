@@ -8,17 +8,19 @@
 #include "tasks/mmc5983ma_task.h"
 #include "tasks/ms5611_task.h"
 #include "tasks/watchdog_task.h"
+#include "tasks/maxf10s_task.h"
 
 namespace tasks {
 class TaskManager {
   private:
     TaskManager() = default;
     static TaskManager instance;
-    tasks::BME280Task* bme280_task_{nullptr};
-    tasks::BMI088Task* bmi088_task_{nullptr};
-    tasks::MMC5983MATask* mmc5983ma_task_{nullptr};
-    tasks::MS5611Task* ms5611_task_{nullptr};
-    tasks::LogTask* log_task_{nullptr};
+    tasks::MAXF10STask* maxf10s_task_{nullptr};
+    // tasks::BME280Task* bme280_task_{nullptr};
+    // tasks::BMI088Task* bmi088_task_{nullptr};
+    // tasks::MMC5983MATask* mmc5983ma_task_{nullptr};
+    // tasks::MS5611Task* ms5611_task_{nullptr};
+    // tasks::LogTask* log_task_{nullptr};
     tasks::WatchdogTask* watchdog_task_{nullptr};
     tasks::CLITask* cli_task_{nullptr};
 

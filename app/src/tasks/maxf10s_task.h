@@ -23,7 +23,7 @@ class MAXF10STask : public rtos::Task {
     /**
      * @brief Constructs an MAXF10STask
      */
-    MAXF10STask(communication::UARTDevice* uart);
+    MAXF10STask(UART_HandleTypeDef* huart);
 
     /**
      * @brief Main task execution function
