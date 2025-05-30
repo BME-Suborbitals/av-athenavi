@@ -1,7 +1,6 @@
 #ifndef MAXF10S_TASK_H
 #define MAXF10S_TASK_H
 
-#include "communication/i2c_threadsafe.h"
 #include "data_observer.h"
 #include "data_provider.h"
 #include "maxf10s.h"
@@ -23,7 +22,7 @@ class MAXF10STask : public rtos::Task {
     /**
      * @brief Constructs an MAXF10STask
      */
-    MAXF10STask(communication::UARTDevice* uart);
+    MAXF10STask();
 
     /**
      * @brief Main task execution function

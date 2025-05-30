@@ -12,6 +12,7 @@ constexpr std::chrono::milliseconds LOG_FREQUENCY(50);
 
 constexpr std::chrono::milliseconds IMU_FREQUENCY(30);
 constexpr std::chrono::milliseconds ENV_FREQUENCY(250);
+constexpr std::chrono::milliseconds GNSS_FREQUENCY(200);
 constexpr std::chrono::milliseconds BARO_FREQUENCY(50);
 constexpr std::chrono::milliseconds MAGNETO_FREQUENCY(30);
 

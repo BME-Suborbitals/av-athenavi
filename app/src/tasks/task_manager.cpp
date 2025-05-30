@@ -22,8 +22,8 @@ void TaskManager::Start(littlefs::LittleFS& file_system) {
     static tasks::MMC5983MATask mmc5983ma_task;
     static tasks::MS5611Task ms5611_task;
 
-    static communication::UARTDevice gnss_uart{&huart3};
-    static tasks::MAXF10STask maxf10s_task{&gnss_uart};
+    // static communication::UARTDevice gnss_uart{&huart3};
+    static tasks::MAXF10STask maxf10s_task{};
 
     static tasks::LogTask log_task{file_system, LOG_FREQUENCY, LOG_TASK_STACK};
     static tasks::WatchdogTask watchdog_task{TASK_TIMEOUT};
@@ -37,6 +37,7 @@ void TaskManager::Start(littlefs::LittleFS& file_system) {
     log_task_ = &log_task;
     watchdog_task_ = &watchdog_task;
     cli_task_ = &cli_task;
+    maxf10s_task_ = &maxf10s_task;
 
     watchdog_task.RegisterTask(&log_task);
     bme280_task.RegisterListener(log_task);
@@ -54,6 +55,9 @@ void TaskManager::EnterMaintenanceMode() {
     bmi088_task_->Suspend();
     ms5611_task_->Suspend();
     mmc5983ma_task_->Suspend();
+    bme280_task_->Suspend();
+    maxf10s_task_->Suspend();
+    
 }
 
 TaskManager& TaskManager::GetInstance() {

@@ -11,19 +11,23 @@
 #include "tasks/data_observer.h"
 
 namespace tasks {
-MAXF10STask::MAXF10STask(communication::UARTDevice* uart)
-    : rtos::Task("MAXF10S", 2000, static_cast<UBaseType_t>(Priority::LOG)),
-      gnss_(uart) {}
+MAXF10STask::MAXF10STask()
+    : rtos::Task("MAXF10S", 2000, static_cast<UBaseType_t>(Priority::SENSOR)), gnss_(&huart3) {}
 
 void MAXF10STask::Run() {
-    gnss_.Initialize();
+    TickType_t last_wake_time = xTaskGetTickCount();
+    const TickType_t delay_ticks = pdMS_TO_TICKS(100);
 
+    gnss_.Initialize(5);
     gnss::MAXF10S::Data gnss_data;
-
+    
     while (true) {
-        if (gnss_.Read(gnss_data)) {
+        gnss_.UpdateFIFO();
+        while (gnss_.Read(gnss_data)) {
+            // mcu::semi << "-\n";
             data_provider_.NotifyListeners(gnss_data);
         }
+        xTaskDelayUntil(&last_wake_time, delay_ticks);
     }
 }
 

@@ -5,6 +5,7 @@
 #include "tasks/bmi088_task.h"
 #include "tasks/cli_task.h"
 #include "tasks/log_task.h"
+#include "tasks/maxf10s_task.h"
 #include "tasks/mmc5983ma_task.h"
 #include "tasks/ms5611_task.h"
 #include "tasks/watchdog_task.h"
@@ -21,6 +22,7 @@ class TaskManager {
     tasks::LogTask* log_task_{nullptr};
     tasks::WatchdogTask* watchdog_task_{nullptr};
     tasks::CLITask* cli_task_{nullptr};
+    tasks::MAXF10STask* maxf10s_task_{nullptr};
 
   public:
     static TaskManager& GetInstance();
